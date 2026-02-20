@@ -1,10 +1,13 @@
 defmodule Mana.Sense.Vereis do
-  @moduledoc "Canonical persisted state for Vereis Discord presence and activities."
+  @moduledoc "Vereis sense supervision tree and canonical schema owner."
 
+  use Supervisor
   use Ecto.Schema
 
   import Ecto.Changeset
   import Mana.Utils, only: [embedded_changeset: 2]
+
+  alias Mana.Sense.Vereis.Discord
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @timestamps_opts [type: :utc_datetime_usec]
@@ -48,5 +51,18 @@ defmodule Mana.Sense.Vereis do
     |> cast_embed(:playing, with: &embedded_changeset/2)
     |> cast_embed(:editing, with: &embedded_changeset/2)
     |> validate_required([:presence])
+  end
+
+  def start_link(opts \\ []) do
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
+  end
+
+  @impl Supervisor
+  def init(_opts) do
+    children = [
+      Discord
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 end

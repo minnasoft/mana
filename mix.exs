@@ -46,7 +46,8 @@ defmodule Mana.MixProject do
       {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
       {:sobelow, "~> 0.14", only: [:dev, :test], runtime: false},
       {:styler, "~> 1.3", only: [:dev, :test], runtime: false},
-      {:excellent_migrations, "~> 0.1", only: [:dev, :test], runtime: false}
+      {:excellent_migrations, "~> 0.1", only: [:dev, :test], runtime: false},
+      {:websockex, "~> 0.4"}
     ]
   end
 

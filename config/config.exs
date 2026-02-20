@@ -29,7 +29,8 @@ config :mana, ManaWeb.Endpoint,
 
 config :mana,
   ecto_repos: [Mana.Repo],
-  generators: [timestamp_type: :utc_datetime]
+  generators: [timestamp_type: :utc_datetime],
+  discord_user_id: System.get_env("DISCORD_USER_ID")
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
