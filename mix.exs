@@ -47,7 +47,8 @@ defmodule Mana.MixProject do
       {:sobelow, "~> 0.14", only: [:dev, :test], runtime: false},
       {:styler, "~> 1.3", only: [:dev, :test], runtime: false},
       {:excellent_migrations, "~> 0.1", only: [:dev, :test], runtime: false},
-      {:websockex, "~> 0.4"}
+      {:websockex, "~> 0.4"},
+      {:oban, "~> 2.19"}
     ]
   end
 
@@ -56,7 +57,7 @@ defmodule Mana.MixProject do
       setup: ["deps.get", "ecto.setup"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       lint: [
         "compile --warnings-as-errors",
         "deps.unlock --unused",

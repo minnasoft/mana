@@ -27,6 +27,13 @@ config :mana, ManaWeb.Endpoint,
   ],
   pubsub_server: Mana.PubSub
 
+config :mana, Oban,
+  repo: Mana.Repo,
+  plugins: [
+    {Oban.Plugins.Cron, crontab: [{"* * * * *", Mana.Sense.Vereis}]}
+  ],
+  queues: [senses: 5]
+
 config :mana,
   ecto_repos: [Mana.Repo],
   generators: [timestamp_type: :utc_datetime],

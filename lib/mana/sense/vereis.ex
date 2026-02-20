@@ -1,8 +1,8 @@
 defmodule Mana.Sense.Vereis do
-  @moduledoc "Vereis sense supervision tree and canonical schema owner."
+  @moduledoc "Canonical Vereis sense schema + callbacks."
 
-  use Supervisor
   use Ecto.Schema
+  use Mana.Sense, queue: :senses
 
   import Ecto.Changeset
   import Mana.Utils, only: [embedded_changeset: 2]
@@ -53,16 +53,38 @@ defmodule Mana.Sense.Vereis do
     |> validate_required([:presence])
   end
 
-  def start_link(opts \\ []) do
-    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
+  @impl Mana.Sense
+  def source do
+    :vereis
   end
 
-  @impl Supervisor
-  def init(_opts) do
-    children = [
-      Discord
-    ]
+  @impl Mana.Sense
+  def poll do
+    Discord.get_state()
+  end
 
-    Supervisor.init(children, strategy: :one_for_one)
+  @impl Mana.Sense
+  def canonical_schema do
+    __MODULE__
+  end
+
+  @impl Mana.Sense
+  def match_key(_current) do
+    %{}
+  end
+
+  @impl Mana.Sense
+  def to_canonical(current) do
+    %{
+      presence: current[:presence] || :offline,
+      listening_to: current[:listening_to],
+      playing: current[:playing],
+      editing: current[:editing]
+    }
+  end
+
+  @impl Mana.Sense
+  def ack_poll(_current, _deltas) do
+    Discord.clear_state()
   end
 end
