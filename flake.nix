@@ -17,6 +17,8 @@
             beam.erlang
             beam.elixir
             pkgs.git
+            pkgs.docker
+            pkgs.docker-compose
           ];
 
           shellHook = ''
