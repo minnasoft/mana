@@ -25,12 +25,6 @@ defmodule Mana.MixProject do
     ]
   end
 
-  def cli do
-    [
-      preferred_envs: [precommit: :test]
-    ]
-  end
-
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
 
@@ -70,9 +64,7 @@ defmodule Mana.MixProject do
         "dialyzer",
         "sobelow --config",
         "excellent_migrations.check_safety"
-      ],
-      ci: ["lint", "test"],
-      precommit: ["ci"]
+      ]
     ]
   end
 end

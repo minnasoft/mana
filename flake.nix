@@ -34,6 +34,32 @@
               excludes = [ ".envrc" ];
             };
 
+            validate-branch-commits = {
+              enable = true;
+              name = "validate-branch-commits";
+              entry = "${pkgs.writeShellScript "validate-branch-commits" ''
+                if [ -n "''${IN_NIX_SHELL:-}" ] || [ -z "''${NIX_BUILD_TOP:-}" ]; then
+                  set -euo pipefail
+                  BASE_BRANCH="''${BASE_BRANCH:-main}"
+                  COMMITS=$(git log --format="%H" "origin/$BASE_BRANCH..HEAD" 2>/dev/null || git log --format="%H" HEAD)
+                  [ -z "$COMMITS" ] && exit 0
+                  FAILED=0
+                  while IFS= read -r commit; do
+                    MSG=$(git log --format=%B -n 1 "$commit")
+                    if ! echo "$MSG" | ${pkgs.convco}/bin/convco check --from-stdin >/dev/null 2>&1; then
+                      echo "Invalid commit message in $commit:"
+                      echo "$MSG"
+                      FAILED=1
+                    fi
+                  done <<<"$COMMITS"
+                  [ $FAILED -eq 1 ] && exit 1 || exit 0
+                else
+                  exit 0
+                fi
+              ''}";
+              pass_filenames = false;
+            };
+
             mix-lint = {
               enable = true;
               name = "mix-lint";
