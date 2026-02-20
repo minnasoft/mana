@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  nix-flake-check:
+    name: Nix Flake Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+        with:
+          use-flakehub: false
+
+      - name: Run nix flake check
+        run: nix flake check --show-trace
+
+  mix-lint:
+    name: Mix Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+        with:
+          use-flakehub: false
+
+      - name: Run mix lint
+        run: |
+          nix develop --command bash -lc '
+            mix local.hex --force
+            mix local.rebar --force
+            mix deps.get
+            mix lint
+          '
+
+  mix-test:
+    name: Mix Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v14
+
+      - name: Setup Nix Cache
+        uses: DeterminateSystems/magic-nix-cache-action@v8
+        with:
+          use-flakehub: false
+
+      - name: Run mix test with docker-compose postgres
+        run: |
+          nix develop --command bash -lc '
+            cp -f .env.example .env
+            docker compose up -d postgres
+            trap "docker compose down -v" EXIT
+
+            mix local.hex --force
+            mix local.rebar --force
+            mix deps.get
+            mix test
+          '
