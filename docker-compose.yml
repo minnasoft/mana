@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:latest
+    container_name: ${MANA_DB_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${MANA_DB_NAME}
+      POSTGRES_USER: ${MANA_DB_USER}
+      POSTGRES_PASSWORD: ${MANA_DB_PASSWORD}
+    ports:
+      - "${MANA_DB_PORT}:5432"
+    volumes:
+      - ${MANA_DB_VOLUME}:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${MANA_DB_USER} -d ${MANA_DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mana_postgres_data:
+    name: ${MANA_DB_VOLUME}
