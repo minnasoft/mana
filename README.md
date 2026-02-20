@@ -1,35 +1,44 @@
 # mana
 
-## dev shell
+Minimal Phoenix API focused on GraphQL.
+
+## setup
 
 ```bash
 nix develop
-```
-
-## postgres (docker compose)
-
-```bash
 cp .env.example .env
+mix deps.get
+mix ecto.create
+mix ecto.migrate
+```
+
+## postgres
+
+```bash
 docker compose up -d postgres
 ```
 
-check status:
+## run
 
 ```bash
-docker compose ps postgres
+mix phx.server
 ```
 
-check readiness:
+GraphQL endpoint:
+- `POST /api/graphql`
 
-```bash
-docker compose exec postgres pg_isready -U "$MANA_DB_USER" -d "$MANA_DB_NAME"
+Example query:
+
+```graphql
+{ health }
 ```
 
-connection string is configured in `.env` via `DATABASE_URL`.
+## quality
 
-If you previously ran a different Postgres image/tag, reset local DB volume before retrying:
+Everything runs via Nix shell and flake-managed hooks.
 
 ```bash
-docker compose down -v
-docker compose up -d postgres
+mix lint
+mix test
+pre-commit run --all-files
 ```
