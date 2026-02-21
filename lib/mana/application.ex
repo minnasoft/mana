@@ -10,8 +10,10 @@ defmodule Mana.Application do
     children = [
       ManaWeb.Telemetry,
       Mana.Repo,
+      {Oban, Application.fetch_env!(:mana, Oban)},
       {DNSCluster, query: Application.get_env(:mana, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Mana.PubSub},
+      Mana.Sense.Vereis.Discord,
       # Start a worker by calling: Mana.Worker.start_link(arg)
       # {Mana.Worker, arg},
       # Start to serve requests, typically the last entry

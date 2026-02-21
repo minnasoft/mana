@@ -15,5 +15,11 @@ config :mana, ManaWeb.Endpoint,
   secret_key_base: "5FoYY6KGjJslPPGuWJYQyENME8vWK7ZicxuDqVdKR5tbiij65YbM9dI0VfPc7vTW",
   server: false
 
+config :mana, Oban,
+  repo: Mana.Repo,
+  testing: :manual,
+  plugins: false,
+  queues: false
+
 config :phoenix, :plug_init_mode, :runtime
 config :phoenix, sort_verified_routes_query_params: true
